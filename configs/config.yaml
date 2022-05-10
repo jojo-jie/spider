@@ -14,5 +14,7 @@ data:
     read_timeout: 0.2s
     write_timeout: 0.2s
   etcd:
-    addr: 127.0.0.1:2379
+    addr:
+      - 127.0.0.1:2379
     dial_timeout: 1s
+  registry_type: 3

@@ -1,4 +1,4 @@
-# Kratos Project Template
+# Kratos Practical Project
 
 ## Install Kratos
 ```

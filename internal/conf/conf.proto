@@ -36,6 +36,23 @@ message Data {
     google.protobuf.Duration read_timeout = 3;
     google.protobuf.Duration write_timeout = 4;
   }
+  message Etcd {
+    repeated string addr = 1;
+    google.protobuf.Duration dial_timeout = 2;
+  }
   Database database = 1;
   Redis redis = 2;
+  Etcd etcd = 3;
+  RegistryType registry_type = 4;
+}
+
+enum RegistryType {
+  NO_SER = 0;
+  CONSUL = 1;
+  DISCOVERY = 2;
+  ETCD = 3;
+  KUBERNETES = 4;
+  NACOS = 5;
+  POLARIS = 6;
+  ZOOKEEPER = 7;
 }
