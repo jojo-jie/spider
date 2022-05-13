@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
 	"github.com/go-kratos/kratos/v2/config/file"
@@ -10,6 +11,7 @@ import (
 	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
+	"github.com/pkg/errors"
 	"os"
 	"spider/internal/conf"
 )
@@ -83,12 +85,12 @@ func main() {
 
 	app, cleanup, err := wireApp(bc.Server, bc.Data, logger)
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("stack %+v", errors.WithStack(err)))
 	}
 	defer cleanup()
 
 	// start and wait for stop signal
 	if err := app.Run(); err != nil {
-		panic(err)
+		panic(fmt.Errorf("stack %+v", errors.WithStack(err)))
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/hashicorp/consul/api"
+	"github.com/pkg/errors"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"spider/internal/conf"
 )
@@ -17,11 +18,10 @@ func NewRegistry(c *conf.Data, data *Data, logger log.Logger) (reg registry.Regi
 		client, err := clientv3.New(clientv3.Config{
 			Endpoints: c.Etcd.GetAddr(),
 		})
-		return etcd.New(client), err
+		return etcd.New(client), errors.Wrap(err, "registry etcd")
 	case conf.RegistryType_name[int32(conf.RegistryType_CONSUL)]:
 		client, err := api.NewClient(api.DefaultConfig())
-		return consul.New(client), err
-	default:
-		return nil, nil
+		return consul.New(client), errors.Wrap(err, "registry consul")
 	}
+	return nil, nil
 }
