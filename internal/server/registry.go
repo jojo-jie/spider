@@ -1,4 +1,4 @@
-package data
+package server
 
 import (
 	"github.com/go-kratos/kratos/contrib/registry/consul/v2"
@@ -12,16 +12,25 @@ import (
 )
 
 // NewRegistry 服务注册发现
-func NewRegistry(c *conf.Data, data *Data, logger log.Logger) (reg registry.Registrar, err error) {
+func NewRegistry(c *conf.Data, logger log.Logger) (registry.Registrar, func(), error) {
 	switch c.GetRegistryType().String() {
 	case conf.RegistryType_name[int32(conf.RegistryType_ETCD)]:
 		client, err := clientv3.New(clientv3.Config{
 			Endpoints: c.Etcd.GetAddr(),
 		})
-		return etcd.New(client), errors.Wrap(err, "registry etcd")
+		cleanup := func() {
+			log.NewHelper(logger).Info("closing the etcd registry resources")
+			client.Close()
+		}
+		return etcd.New(client), cleanup, errors.Wrap(err, "registry etcd")
 	case conf.RegistryType_name[int32(conf.RegistryType_CONSUL)]:
 		client, err := api.NewClient(api.DefaultConfig())
-		return consul.New(client), errors.Wrap(err, "registry consul")
+		cleanup := func() {
+			log.NewHelper(logger).Info("closing the consul registry resources")
+		}
+		return consul.New(client), cleanup, errors.Wrap(err, "registry consul")
 	}
-	return nil, nil
+	return nil, func() {
+		log.NewHelper(logger).Info("local config file")
+	}, nil
 }

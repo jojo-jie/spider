@@ -10,6 +10,7 @@ import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"spider/internal/biz"
+	"spider/internal/cache"
 	"spider/internal/conf"
 	"spider/internal/data"
 	"spider/internal/server"
@@ -20,22 +21,30 @@ import (
 
 // wireApp init kratos application.
 func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*kratos.App, func(), error) {
-	dataData, cleanup, err := data.NewData(confData, logger)
+	cacheCache, cleanup, err := cache.NewCache(confData, logger)
 	if err != nil {
 		return nil, nil, err
 	}
+	dataData, cleanup2, err := data.NewData(confData, logger)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
 	greeterRepo := data.NewGreeterRepo(dataData, logger)
-	greeterUsecase := biz.NewGreeterUsecase(greeterRepo, logger)
+	greeterUsecase := biz.NewGreeterUsecase(cacheCache, greeterRepo, logger)
 	greeterService := service.NewGreeterService(greeterUsecase)
 	httpServer := server.NewHTTPServer(confServer, greeterService, logger)
 	grpcServer := server.NewGRPCServer(confServer, greeterService, logger)
-	registrar, err := data.NewRegistry(confData, dataData, logger)
+	registrar, cleanup3, err := server.NewRegistry(confData, logger)
 	if err != nil {
+		cleanup2()
 		cleanup()
 		return nil, nil, err
 	}
 	app := newApp(logger, httpServer, grpcServer, registrar)
 	return app, func() {
+		cleanup3()
+		cleanup2()
 		cleanup()
 	}, nil
 }

@@ -13,7 +13,7 @@ import (
 )
 
 // ProviderSet is data providers.
-var ProviderSet = wire.NewSet(NewData, NewGreeterRepo, NewRegistry)
+var ProviderSet = wire.NewSet(NewData, NewGreeterRepo)
 
 // Data .
 type Data struct {
@@ -36,6 +36,7 @@ func NewData(c *conf.Data, logger log.Logger) (*Data, func(), error) {
 	cleanup := func() {
 		log.NewHelper(logger).Info("closing the data resources")
 		client.Close()
+		db.Close()
 	}
 	if err := client.Schema.Create(context.Background()); err != nil {
 		return nil, nil, errors.Wrap(err, "client Schema fail")

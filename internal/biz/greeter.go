@@ -2,10 +2,11 @@ package biz
 
 import (
 	"context"
+	"spider/internal/cache"
 
-	v1 "spider/api/helloworld/v1"
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/log"
+	v1 "spider/api/helloworld/v1"
 )
 
 var (
@@ -29,13 +30,14 @@ type GreeterRepo interface {
 
 // GreeterUsecase is a Greeter usecase.
 type GreeterUsecase struct {
-	repo GreeterRepo
-	log  *log.Helper
+	cache *cache.Cache
+	repo  GreeterRepo
+	log   *log.Helper
 }
 
 // NewGreeterUsecase new a Greeter usecase.
-func NewGreeterUsecase(repo GreeterRepo, logger log.Logger) *GreeterUsecase {
-	return &GreeterUsecase{repo: repo, log: log.NewHelper(logger)}
+func NewGreeterUsecase(cache *cache.Cache, repo GreeterRepo, logger log.Logger) *GreeterUsecase {
+	return &GreeterUsecase{cache: cache, repo: repo, log: log.NewHelper(logger)}
 }
 
 // CreateGreeter creates a Greeter, and returns the new Greeter.
