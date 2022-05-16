@@ -12,6 +12,7 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/go-kratos/kratos/v2/transport/http"
 	"github.com/pkg/errors"
+	"go.opentelemetry.io/otel/sdk/trace"
 	"os"
 	"spider/internal/conf"
 )
@@ -35,7 +36,7 @@ func init() {
 	flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf "+configName)
 }
 
-func newApp(logger log.Logger, hs *http.Server, gs *grpc.Server, reg registry.Registrar) *kratos.App {
+func newApp(logger log.Logger, hs *http.Server, gs *grpc.Server, provider *trace.TracerProvider, reg registry.Registrar) *kratos.App {
 	options := make([]kratos.Option, 0, 10)
 	options = append(options, kratos.ID(id),
 		kratos.Name(Name),
@@ -83,7 +84,7 @@ func main() {
 		panic(err)
 	}
 
-	app, cleanup, err := wireApp(bc.Server, bc.Data, logger)
+	app, cleanup, err := wireApp(bc.Server, bc.Data, logger, Name)
 	if err != nil {
 		panic(fmt.Errorf("stack %+v", errors.WithStack(err)))
 	}
