@@ -13,6 +13,7 @@ require (
 	github.com/hashicorp/consul/api v1.12.0
 	github.com/pkg/errors v0.9.1
 	go.etcd.io/etcd/client/v3 v3.5.4
+	go.opentelemetry.io/otel/sdk v1.3.0
 	google.golang.org/genproto v0.0.0-20220505152158-f39f71e6c8f3
 	google.golang.org/grpc v1.46.0
 	google.golang.org/protobuf v1.28.0

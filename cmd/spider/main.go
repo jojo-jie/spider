@@ -15,6 +15,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/trace"
 	"os"
 	"spider/internal/conf"
+	"strings"
 )
 
 // go build -ldflags "-X main.Version=x.y.z"
@@ -34,6 +35,8 @@ var (
 func init() {
 	configName = "config.yaml"
 	flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf "+configName)
+	pwd, _ := os.Getwd()
+	Name = pwd[strings.LastIndex(pwd, "/")+1:]
 }
 
 func newApp(logger log.Logger, hs *http.Server, gs *grpc.Server, provider *trace.TracerProvider, reg registry.Registrar) *kratos.App {
