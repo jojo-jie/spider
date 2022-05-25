@@ -10,6 +10,9 @@ data:
   database:
     driver: mysql
     source: root:123456@(127.0.0.1:3306)/spider?charset=utf8mb4&parseTime=True&loc=Local
+    max_idle_conns: 10
+    max_open_conns: 100
+    conn_max_lifetime: 60s
   redis:
     addr: 127.0.0.1:6389
     read_timeout: 0.2s

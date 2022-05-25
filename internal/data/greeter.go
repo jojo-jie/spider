@@ -2,8 +2,9 @@ package data
 
 import (
 	"context"
-
 	"github.com/go-kratos/kratos/v2/log"
+	"spider/ent"
+	"spider/ent/user"
 	"spider/internal/biz"
 )
 
@@ -21,7 +22,14 @@ func NewGreeterRepo(data *Data, logger log.Logger) biz.GreeterRepo {
 }
 
 func (r *greeterRepo) Save(ctx context.Context, g *biz.Greeter) (*biz.Greeter, error) {
-	return g, nil
+	_, err := r.data.client.User.Query().Where(user.Nickname(g.Hello)).First(ctx)
+	if err != nil {
+		if !ent.IsNotFound(err) {
+			return g, nil
+		}
+	}
+	_, err = r.data.client.User.Create().SetNickname(g.Hello).SetAccount(g.Hello).Save(ctx)
+	return g, err
 }
 
 func (r *greeterRepo) Update(ctx context.Context, g *biz.Greeter) (*biz.Greeter, error) {
