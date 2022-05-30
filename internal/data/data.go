@@ -64,8 +64,13 @@ func NewData(c *conf.Data, logger log.Logger) (*Data, func(), error) {
 				msg := fmt.Sprintf("Op=%s\tType=%s\tTime=%s\tConcreteType=%T\n", m.Op(), m.Type(), time.Since(start), m)
 				log.NewHelper(logger).Infof(msg)
 				_, span := otel.GetTracerProvider().Tracer("").Start(ctx, "ent sql")
-				span.SetAttributes(attribute.String("sql_msg", msg))
-				span.SetName("zzzyf")
+				span.SetName("sql " + m.Type())
+				span.SetAttributes(
+					attribute.String("Op", m.Op().String()),
+					attribute.String("Type", m.Type()),
+					attribute.String("Time", time.Since(start).String()),
+					attribute.StringSlice("fields", m.Fields()),
+				)
 				span.SetStatus(codes.Unset, "ok")
 				defer span.End()
 			}()
